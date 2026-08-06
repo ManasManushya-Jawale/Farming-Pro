@@ -1,0 +1,4 @@
+sounddevice
+faster-whisper
+google-genai
+pyserial
