@@ -23,7 +23,7 @@ Along with that, you would also need to give a Google gemini API key to the prog
 In order to make the circuit yourself, follow the given steps:
 1. Make the following circuit:
 <img src="image/Circuit.png">
-2. Upload [Arduino Controller Script](/ArduinoController.ino) into your arduino UNO.
+2. Open ArduinoController in arduino IDE and upload `ArduinoController.ino` .
 3. Run the [Transcriber](/Transcriber.py)
 4. Enter your API key
 5. Keep the app running
