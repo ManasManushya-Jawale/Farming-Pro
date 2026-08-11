@@ -8,11 +8,10 @@
 #include <DHT.h>
 #include <Wire.h>
 
-#define SPEAKER_PIN 0  // Must be a supported PWM pin
 #define SOIL_PIN A0
 
-#define WATER_PUMP_IN 8
-#define WATER_PUMP_OUT 9
+#define WATER_PUMP 8
+#define PLANT_PUMP 9
 
 #define MODE_L 6
 #define MODE_R 7
@@ -46,71 +45,65 @@ void setup() {
   dht.begin();
 
   u8g2.begin();
-  u8g2.clearBuffer();
-  u8g2.drawBox(20, 20, 20, 20);
-  u8g2.sendBuffer();
 
   pinMode(TRIG_PIN, OUTPUT);
   pinMode(ECHO_PIN, INPUT);
-  pinMode(SOIL_PIN, INPUT);
 
   pinMode(MODE_L, INPUT_PULLUP);
   pinMode(MODE_R, INPUT_PULLUP);
-  pinMode(WATER_PUMP_IN, OUTPUT);
-  pinMode(SPEAKER_PIN, OUTPUT);
+  pinMode(WATER_PUMP, OUTPUT);
+  pinMode(PLANT_PUMP, OUTPUT);
 }
 
+#define TANK_HEIGHT 10.0  // Tank height in cm
 
-float readDistanceCM() {
+float get_distance() {
+  // Send ultrasonic pulse
   digitalWrite(TRIG_PIN, LOW);
   delayMicroseconds(2);
+
   digitalWrite(TRIG_PIN, HIGH);
   delayMicroseconds(10);
   digitalWrite(TRIG_PIN, LOW);
 
-  int duration = pulseIn(ECHO_PIN, HIGH, ULTRASONIC_TIMEOUT_US);
+  // Measure echo time
+  unsigned long duration = pulseIn(ECHO_PIN, HIGH, 30000);
 
-  if (duration == 0)
-    return -1;  // no echo received (out of range / timeout)
+  // No echo
+  if (duration == 0) {
+    return -1;
+  }
 
-  return duration * 0.034f / 2.0f;
+  // Convert time to distance
+  float distance = duration * 0.0343 / 2.0;
+
+  return distance;
 }
 
-float get_stable_distance() {
-  const int samples = 7;
-  float readings[samples];
-  int valid = 0;
+float get_water_level() {
+  float distance = get_distance();
 
-  for (int i = 0; i < samples; i++) {
-    float reading = readDistanceCM();
-
-    if (reading > ULTRASONIC_MIN && reading < ULTRASONIC_LIMIT) {
-      readings[valid++] = reading;
-    }
-
-    delay(ULTRASONIC_SAMPLE_GAP_MS);
+  if (distance < 0) {
+    return -1;
   }
 
-  if (valid == 0)
-    return -1;  // signal "no reliable reading" instead of 0
+  // Distance from sensor to water surface
+  float level = TANK_HEIGHT - distance;
 
-  // Sort
-  for (int i = 0; i < valid - 1; i++) {
-    for (int j = i + 1; j < valid; j++) {
-      if (readings[j] < readings[i]) {
-        float temp = readings[i];
-        readings[i] = readings[j];
-        readings[j] = temp;
-      }
-    }
-  }
+  // Clamp the result
+  level = constrain(level, 0.0, TANK_HEIGHT);
 
-  // Median
-  return readings[valid / 2];
+  // Convert to percentage
+  float percentage = (level / TANK_HEIGHT) * 100.0;
+
+  return percentage;
 }
 
 bool previous_L = LOW;
 bool previous_R = LOW;
+
+bool previous_M1 = LOW;
+bool previous_M2 = LOW;
 
 void read_Buttons() {
 
@@ -129,11 +122,34 @@ void read_Buttons() {
   }
 
   previous_R = current_R;
+
+  bool current_M1 = digitalRead(WATER_PUMP);
+
+  if (previous_M1 == HIGH && current_M1 == LOW) {
+    digitalWrite(WATER_PUMP, HIGH);
+  } else if (previous_M1 == LOW && current_M1 == HIGH) {
+    digitalWrite(WATER_PUMP, HIGH);
+  }
+
+  previous_M1 = current_M1;
+
+  bool current_M2 = digitalRead(PLANT_PUMP);
+
+  if (previous_M2 == HIGH && current_M1 == LOW) {
+    digitalWrite(PLANT_PUMP, HIGH);
+  } else if (previous_M2 == LOW && current_M1 == HIGH) {
+    digitalWrite(PLANT_PUMP, HIGH);
+  }
+
+  previous_M2 = current_M2;
 }
 
 int get_moisture() {
   int raw = analogRead(SOIL_PIN);
-  return map(raw, 0, 4095, 0, 100);
+  Serial.print("RAW moisture: ");
+  Serial.println(raw);
+  return map(raw, 0, 1023, 255, 0);
+  // return raw;
 }
 
 float temperature = 0, humidity = 0, moisture = 0;
@@ -171,7 +187,7 @@ void loop() {
         show_Moisture(u8g2, moisture);
         break;
       case 4:
-        show_water_level(u8g2, get_stable_distance());
+        show_water_level(u8g2, get_water_level());
         break;
     }
   }
