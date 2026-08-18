@@ -118,14 +118,12 @@ def ask():
 
 # Convert spoken numbers to digits
         number_words = {
-            "zero": "0",
             "one": "1",
+            "first": "1",
+            "second": "2",
             "two": "2",
             "too": "2",
             "to": "2",
-            "three": "3",
-            "four": "4",
-            "five": "5",
         }
 
         for word, number in number_words.items():
