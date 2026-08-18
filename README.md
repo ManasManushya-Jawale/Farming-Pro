@@ -21,7 +21,7 @@ Along with that, you would also need to give a Google gemini API key to the prog
 
 ## Setup
 In order to make the circuit yourself, follow the given steps:
-1. Make the following circuit:
+1. Make the following circuit: (We recommend to use Capacitive Soil Sensor)
 <img src="image/Circuit.png">
 2. Open ArduinoController in arduino IDE and upload `ArduinoController.ino` .
 3. Run the [Transcriber](/Transcriber.py)
