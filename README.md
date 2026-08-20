@@ -7,6 +7,6 @@ Farming++ is a project made with aim to making farming easier using robotics and
 With the use of this such technologies, farmers can inspect how good soil is, what is the weather, etc.
 
 # Documentation
-* [Requirements](/Requirements.md)
-* [How to Setup the project](/Setup.md)
-* [How to Use it](/HowToUse.md)
+1. [Requirements](/Requirements.md)
+2. [How to Setup the project](/Setup.md)
+3. [How to Use it](/HowToUse.md)
