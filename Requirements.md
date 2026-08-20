@@ -15,6 +15,12 @@ The dependencies of this project are:
 * Jumper wires
 * USB cable / suitable power supply for Arduino Uno
 
+## Calibration
+The project uses some hardcoded values that you need to change before using it. To do so,  follow the following steps:
+* Change the line no. 18 of the `Transriber.py` to the serial port that your Arduino is connected to.
+* Calibrate the `DRY_SOIL` (line 31) and `WET_SOIL` (line 32) values with the amounts that you think are good for your surrioundings.
+* Set the value of `WELL_HEIGHT` (line 29) in arduino code with the height of your well
+
 ## Prequisties
 In order to use this in your own circuit, first follow the following steps:
 1. Copy the git HTTPs URL of this repository

@@ -9,3 +9,4 @@ With the use of this such technologies, farmers can inspect how good soil is, wh
 # Documentation
 * [Requirements](/Prequisties.md)
 * [How to Setup the project](/Setup.md)
+* [How to Use it](/HowToUse.md)

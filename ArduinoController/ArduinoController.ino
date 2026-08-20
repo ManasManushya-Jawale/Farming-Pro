@@ -26,7 +26,10 @@
 #define ULTRASONIC_TIMEOUT_US 25000
 #define ULTRASONIC_SAMPLE_GAP_MS 60
 
-#define TANK_HEIGHT 7.5
+#define WELL_HEIGHT 7.5
+
+#define DRY_SOIL 20
+#define WET_SOIL 80
 
 uint8_t display_mode = 0;
 
@@ -119,13 +122,13 @@ float get_water_level() {
   }
 
   // Distance from sensor to water surface
-  float level = TANK_HEIGHT - distance;
+  float level = WELL_HEIGHT - distance;
 
   // Clamp the result
-  level = constrain(level, 0.0, TANK_HEIGHT);
+  level = constrain(level, 0.0, WELL_HEIGHT);
 
   // Convert to percentage
-  float percentage = (level / TANK_HEIGHT) * 100.0;
+  float percentage = (level / WELL_HEIGHT) * 100.0;
 
   return percentage;
 }
@@ -273,7 +276,7 @@ void loop() {
           u8g2,
           temperature < 10 || temperature > 35,
           humidity < 20 || humidity > 90,
-          moisture < 20 || moisture > 90,
+          moisture < DRY_SOIL || moisture > WET_SOIL,
           false);
         break;
 
